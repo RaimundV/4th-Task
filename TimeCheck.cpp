@@ -2,7 +2,8 @@
 // Created by 123 on 2018-05-15.
 //
 #include "vector.h"
-
+#include <chrono>
+#include <vector>
 void TimeCheck(size_t amount)
 {
     Vector<int> myVector;
@@ -16,7 +17,6 @@ void TimeCheck(size_t amount)
         myVector.push_back(j);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
-
     mySumTime = (t2 - t1);
 
     high_resolution_clock::time_point t3 = high_resolution_clock::now();

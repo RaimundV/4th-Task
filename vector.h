@@ -5,10 +5,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-#include <cstdlib>
 #include <exception>
-#include <vector>
-#include <chrono>
 
 template <typename ValueType>
 class Vector {
@@ -52,7 +49,169 @@ public:
     Vector(const Vector & src);
     Vector & operator=(const Vector & src);
 
+
+
+    class iterator :
+                    public std::iterator<std::random_access_iterator_tag, ValueType>{
+
+    private:
+        const Vector *vp;
+        int index;
+
+    public:
+
+        iterator() {
+            this->vp = NULL;
+        }
+
+        iterator(const iterator & it) {
+            this->vp = it.vp;
+            this->index = it.index;
+        }
+
+        iterator(const Vector *vp, int index) {
+            this->vp = vp;
+            this->index = index;
+        }
+
+        iterator & operator++() {
+            index++;
+            return *this;
+        }
+
+        iterator operator++(int) {
+            iterator copy(*this);
+            operator++();
+            return copy;
+        }
+
+        iterator & operator--() {
+            index--;
+            return *this;
+        }
+
+        iterator operator--(int) {
+            iterator copy(*this);
+            operator--();
+            return copy;
+        }
+
+        bool operator==(const iterator & rhs) {
+            return vp == rhs.vp && index == rhs.index;
+        }
+
+        bool operator!=(const iterator & rhs) {
+            return !(*this == rhs);
+        }
+
+        bool operator<(const iterator & rhs) {
+            extern void error(std::string msg);
+            if (vp != rhs.vp) std::cout << "Iterators are in different vectors";
+            return index < rhs.index;
+        }
+
+        bool operator<=(const iterator & rhs) {
+            extern void error(std::string msg);
+            if (vp != rhs.vp) std::cout <<"Iterators are in different vectors";
+            return index <= rhs.index;
+        }
+
+        bool operator>(const iterator & rhs) {
+            extern void error(std::string msg);
+            if (vp != rhs.vp) std::cout << "Iterators are in different vectors";
+            return index > rhs.index;
+        }
+
+        bool operator>=(const iterator & rhs) {
+            extern void error(std::string msg);
+            if (vp != rhs.vp) std::cout << "Iterators are in different vectors";
+            return index >= rhs.index;
+        }
+
+        iterator operator+(const int & rhs) {
+            return iterator(vp, index + rhs);
+        }
+
+        iterator operator+=(const int & rhs) {
+            index += rhs;
+            return *this;
+        }
+
+        iterator operator-(const int & rhs) {
+            return iterator(vp, index - rhs);
+        }
+
+        iterator operator-=(const int & rhs) {
+            index -= rhs;
+            return *this;
+        }
+
+        int operator-(const iterator & rhs) {
+            extern void error(std::string msg);
+            if (vp != rhs.vp) std::cout << "Iterators are in different vectors";
+            return index - rhs.index;
+        }
+
+        ValueType & operator*() {
+            return vp->elements[index];
+        }
+
+        ValueType *operator->() {
+            return &vp->elements[index];
+        }
+
+        ValueType & operator[](int k) {
+            return vp->elements[index + k];
+        }
+
+    };
+
+    iterator begin() const {
+        return iterator(this, 0);
+    }
+
+    iterator end() const {
+        return iterator(this, count);
+    }
+
+    iterator erase(iterator it) {
+        auto newelem = new ValueType[count];
+        auto j = 0;
+        for (auto i = begin(); i != it; i++) {
+            newelem[j] = *i;
+            j++;
+        }
+        for (auto i = it + 1; i != end(); i++)
+        {
+            newelem[j] = *i;
+            j++;
+        }
+        delete[] elements;
+        elements = newelem;
+        capacity--;
+        count = j;
+    }
+
+    iterator erase(iterator it, iterator it2) {
+        auto newelem = new ValueType[count];
+        auto amount = it2 - it;
+        auto j = 0;
+        for (auto i = begin(); i != it; i++) {
+            newelem[j] = *i;
+            j++;
+        }
+        for (auto i = it2; i != end(); i++)
+        {
+            newelem[j] = *i;
+            j++;
+        }
+        delete[] elements;
+        elements = newelem;
+        capacity -= amount;
+        count = j;
+    }
 };
+
 template <typename ValueType>
 Vector<ValueType>::Vector() {
     count = capacity = 0;
@@ -150,7 +309,7 @@ void Vector<ValueType>::add(ValueType value) {
 
 template <typename ValueType>
 void Vector<ValueType>::expandCapacity() {
-    capacity = __max(1, capacity * 2);
+    capacity = std::max(1, capacity * 2);
     ValueType *array = new ValueType[capacity];
     for (int i = 0; i < count; i++) {
         array[i] = elements[i];
@@ -158,5 +317,8 @@ void Vector<ValueType>::expandCapacity() {
     if (elements != NULL) delete[] elements;
     elements = array;
 }
+
+
+
 void TimeCheck(size_t amount);
 #endif
