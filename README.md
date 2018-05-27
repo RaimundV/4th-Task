@@ -56,3 +56,7 @@ Creating my own Vector container, and testing how it goes against std::vector.
 | 1000 | 0.126098 s | 0.059041 s
 | 10000 | 11.6623 s | 5.04358 s
 | 100000 | 1145.99 s | 453.388 s
+
+## Warning
+
+for this to work you need wow.txt files from the 3rd task that we had :)
